@@ -1,6 +1,7 @@
 const express = require("express");
 const morgan = require("morgan");
 const { adminRouter } = require("../routes/staff/adminRouter");
+const { globalErrorHandler, notFoundError } = require("../middlewares/globalErrorHandler");
 
 const app = express();
 
@@ -10,14 +11,8 @@ app.use(express.json());
 
 app.use("/api/v1/admins", adminRouter);
 
-app.use((req, res, next) => {
-  res.send("HELOO ERROR");
-});
-app.use((error, req, res, next) => {
-  res.json({
-    status: error.status,
-    message: error.message,
-  });
-});
+// =========== Error Middleware =========== //
+app.use(notFoundError);
+app.use(globalErrorHandler);
 
 module.exports = { app };
