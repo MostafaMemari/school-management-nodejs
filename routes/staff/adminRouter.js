@@ -15,6 +15,8 @@ const {
   deleteAdminCtrl,
 } = require("../../controller/staff/adminController");
 
+const { isLogin } = require("../../middlewares/isLogin");
+
 //register
 adminRouter.post("/register", registerAdmCtrl);
 
@@ -22,7 +24,7 @@ adminRouter.post("/register", registerAdmCtrl);
 adminRouter.post("/login", loginAdminCtrl);
 
 //get all
-adminRouter.get("/", getAdminsCtrl);
+adminRouter.get("/", isLogin, getAdminsCtrl);
 
 //single
 

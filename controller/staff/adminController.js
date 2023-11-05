@@ -2,6 +2,8 @@ const AsyncHandler = require("express-async-handler");
 
 const expressAsyncHandler = require("express-async-handler");
 const { adminModel } = require("../../model/Staff/adminModel");
+const { generateToken } = require("../../utils/generateToken");
+const { verifyToken } = require("../../utils/verifyToken");
 
 //@desc Register admin
 //@route POST /api/admins/register
@@ -21,24 +23,25 @@ exports.registerAdmCtrl = AsyncHandler(async (req, res, next) => {
 //@desc     login admins
 //@route    POST /api/v1/admins/login
 //@access   Private
-exports.loginAdminCtrl = async (req, res, next) => {
+exports.loginAdminCtrl = AsyncHandler(async (req, res, next) => {
   const { email, password } = req.body;
 
-  try {
-    // find user
-    const user = await adminModel.findOne({ email });
-    if (!user) return res.json({ message: "user not found" });
-    if (user && (await user.verifyPassword(password))) return res.json({ data: user });
-    return res.json({ message: "Invalid login credentials" });
-  } catch (error) {
-    next(error);
+  // find user
+  const user = await adminModel.findOne({ email });
+  if (!user) return res.json({ message: "user not found" });
+  if (user && (await user.verifyPassword(password))) {
+    const token = generateToken(user._id);
+    const verify = verifyToken(token);
+    return res.json({ data: generateToken(user._id), user, verify });
   }
-};
+  return res.json({ message: "Invalid login credentials" });
+});
 //@desc     Get all admins
 //@route    GET /api/v1/admins
 //@access   Private
 exports.getAdminsCtrl = async (req, res, next) => {
   try {
+    res.send(req.userAuth);
   } catch (error) {
     next(error);
   }
