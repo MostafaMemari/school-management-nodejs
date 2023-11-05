@@ -1,8 +1,20 @@
+const { adminModel } = require("../../model/Staff/adminModel");
+
 //@desc Register admin
 //@route POST /api/admins/register
+
 //@acess  Private
 exports.registerAdmCtrl = async (req, res, next) => {
+  const { name, email, password } = req.body;
   try {
+    const amdinFound = await adminModel.findOne({ email });
+    if (amdinFound) return res.json("Admin Exists");
+    const user = await adminModel.create({ name, email, password });
+
+    res.status(201).json({
+      status: "success",
+      data: user,
+    });
   } catch (error) {
     next(error);
   }
@@ -11,16 +23,21 @@ exports.registerAdmCtrl = async (req, res, next) => {
 //@route    POST /api/v1/admins/login
 //@access   Private
 exports.loginAdminCtrl = async (req, res, next) => {
+  const { email, password } = req.body;
+
   try {
+    // find user
+    const user = await adminModel.findOne({ email });
+    if (!user) return res.json({ message: "user not found" });
+    if (user && (await user.verifyPassword(password))) return res.json({ data: user });
+    return res.json({ message: "Invalid login credentials" });
   } catch (error) {
     next(error);
   }
 };
-
 //@desc     Get all admins
 //@route    GET /api/v1/admins
 //@access   Private
-
 exports.getAdminsCtrl = async (req, res, next) => {
   try {
   } catch (error) {
@@ -30,14 +47,12 @@ exports.getAdminsCtrl = async (req, res, next) => {
 //@desc     Get single admin
 //@route    GET /api/v1/admins/:id
 //@access   Private
-
 exports.getAdminProfileCtrl = async (req, res, next) => {
   try {
   } catch (error) {
     next(error);
   }
 };
-
 //@desc    update admin
 //@route    UPDATE /api/v1/admins/:id
 //@access   Private
@@ -47,7 +62,6 @@ exports.updateAdminCtrl = async (req, res, next) => {
     next(error);
   }
 };
-
 //@desc     Delete admin
 //@route    DELETE /api/v1/admins/:id
 //@access   Private
@@ -57,11 +71,9 @@ exports.deleteAdminCtrl = (req, res, next) => {
     next(error);
   }
 };
-
 //@desc     admin suspends a teacher
 //@route    PUT /api/v1/admins/suspend/teacher/:id
 //@access   Private
-
 exports.adminSuspendTeacherCtrl = (req, res, next) => {
   try {
   } catch (error) {
@@ -104,7 +116,6 @@ exports.adminPublishResultsCtrl = (req, res, next) => {
     next(error);
   }
 };
-
 //@desc     admin unpublish exam result
 //@route    PUT /api/v1/admins/unpublish/exam/:id
 //@access   Private
