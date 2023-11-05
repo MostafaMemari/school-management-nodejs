@@ -14,6 +14,7 @@ const {
   adminUnPublishResultsCtrl,
   deleteAdminCtrl,
 } = require("../../controller/staff/adminController");
+const { isAdmin } = require("../../middlewares/isAdmin");
 
 const { isLogin } = require("../../middlewares/isLogin");
 
@@ -25,10 +26,9 @@ adminRouter.post("/login", loginAdminCtrl);
 
 //get all
 adminRouter.get("/", isLogin, getAdminsCtrl);
-
 //single
 
-adminRouter.get("/profile", getAdminProfileCtrl);
+adminRouter.get("/profile", isLogin, isAdmin, getAdminProfileCtrl);
 
 //update
 adminRouter.put("/", updateAdminCtrl);

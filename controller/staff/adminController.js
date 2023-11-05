@@ -9,7 +9,7 @@ const { verifyToken } = require("../../utils/verifyToken");
 //@route POST /api/admins/register
 
 //@acess  Private
-exports.registerAdmCtrl = AsyncHandler(async (req, res, next) => {
+exports.registerAdmCtrl = AsyncHandler(async (req, res) => {
   const { name, email, password } = req.body;
   const amdinFound = await adminModel.findOne({ email });
   if (amdinFound) throw new Error("Admin Exists");
@@ -18,47 +18,52 @@ exports.registerAdmCtrl = AsyncHandler(async (req, res, next) => {
   res.status(201).json({
     status: "success",
     data: user,
+    message: "Admin Registered Successfully",
   });
 });
 //@desc     login admins
 //@route    POST /api/v1/admins/login
 //@access   Private
-exports.loginAdminCtrl = AsyncHandler(async (req, res, next) => {
+exports.loginAdminCtrl = AsyncHandler(async (req, res) => {
   const { email, password } = req.body;
-
-  // find user
   const user = await adminModel.findOne({ email });
-  if (!user) return res.json({ message: "user not found" });
-  if (user && (await user.verifyPassword(password))) {
-    const token = generateToken(user._id);
-    const verify = verifyToken(token);
-    return res.json({ data: generateToken(user._id), user, verify });
-  }
+
+  if (!user) return res.json({ message: "Invalid login credentials" });
+  if (user && (await user.verifyPassword(password)))
+    return res.json({ data: generateToken(user._id), message: "Admin logged in successfuly" });
   return res.json({ message: "Invalid login credentials" });
 });
 //@desc     Get all admins
 //@route    GET /api/v1/admins
 //@access   Private
-exports.getAdminsCtrl = async (req, res, next) => {
-  try {
-    res.send(req.userAuth);
-  } catch (error) {
-    next(error);
-  }
-};
+exports.getAdminsCtrl = AsyncHandler(async (req, res) => {
+  const amdins = await adminModel.find({});
+  res.status(200).json({
+    status: "success",
+    message: "Admins fetched successfully",
+    data: amdins,
+  });
+});
 //@desc     Get single admin
 //@route    GET /api/v1/admins/:id
 //@access   Private
-exports.getAdminProfileCtrl = async (req, res, next) => {
-  try {
-  } catch (error) {
-    next(error);
+exports.getAdminProfileCtrl = AsyncHandler(async (req, res) => {
+  const admin = await adminModel.findById(req.userAuth._id).select("-password -createdAt -updatedAt");
+  console.log(admin);
+  if (!admin) {
+    throw new Error("Admin Not Found");
+  } else {
+    res.status(200).json({
+      status: "success",
+      data: admin,
+      message: "Admin Profile fetched successfully",
+    });
   }
-};
+});
 //@desc    update admin
 //@route    UPDATE /api/v1/admins/:id
 //@access   Private
-exports.updateAdminCtrl = async (req, res, next) => {
+exports.updateAdminCtrl = async (req, res) => {
   try {
   } catch (error) {
     next(error);
@@ -67,7 +72,7 @@ exports.updateAdminCtrl = async (req, res, next) => {
 //@desc     Delete admin
 //@route    DELETE /api/v1/admins/:id
 //@access   Private
-exports.deleteAdminCtrl = (req, res, next) => {
+exports.deleteAdminCtrl = (req, res) => {
   try {
   } catch (error) {
     next(error);
@@ -76,7 +81,7 @@ exports.deleteAdminCtrl = (req, res, next) => {
 //@desc     admin suspends a teacher
 //@route    PUT /api/v1/admins/suspend/teacher/:id
 //@access   Private
-exports.adminSuspendTeacherCtrl = (req, res, next) => {
+exports.adminSuspendTeacherCtrl = (req, res) => {
   try {
   } catch (error) {
     next(error);
@@ -85,7 +90,7 @@ exports.adminSuspendTeacherCtrl = (req, res, next) => {
 //@desc     admin unsuspends a teacher
 //@route    PUT /api/v1/admins/unsuspend/teacher/:id
 //@access   Private
-exports.adminUnSuspendTeacherCtrl = (req, res, next) => {
+exports.adminUnSuspendTeacherCtrl = (req, res) => {
   try {
   } catch (error) {
     next(error);
@@ -94,7 +99,7 @@ exports.adminUnSuspendTeacherCtrl = (req, res, next) => {
 //@desc     admin withdraws a teacher
 //@route    PUT /api/v1/admins/withdraw/teacher/:id
 //@access   Private
-exports.adminWithdrawTeacherCtrl = (req, res, next) => {
+exports.adminWithdrawTeacherCtrl = (req, res) => {
   try {
   } catch (error) {
     next(error);
@@ -103,7 +108,7 @@ exports.adminWithdrawTeacherCtrl = (req, res, next) => {
 //@desc     admin Unwithdraws a teacher
 //@route    PUT /api/v1/admins/withdraw/teacher/:id
 //@access   Private
-exports.adminUnWithdrawTeacherCtrl = (req, res, next) => {
+exports.adminUnWithdrawTeacherCtrl = (req, res) => {
   try {
   } catch (error) {
     next(error);
@@ -112,7 +117,7 @@ exports.adminUnWithdrawTeacherCtrl = (req, res, next) => {
 //@desc     admin publich exam result
 //@route    PUT /api/v1/admins/publish/exam/:id
 //@access   Private
-exports.adminPublishResultsCtrl = (req, res, next) => {
+exports.adminPublishResultsCtrl = (req, res) => {
   try {
   } catch (error) {
     next(error);
@@ -121,7 +126,7 @@ exports.adminPublishResultsCtrl = (req, res, next) => {
 //@desc     admin unpublish exam result
 //@route    PUT /api/v1/admins/unpublish/exam/:id
 //@access   Private
-exports.adminUnPublishResultsCtrl = (req, res, next) => {
+exports.adminUnPublishResultsCtrl = (req, res) => {
   try {
   } catch (error) {
     next(error);
