@@ -1,9 +1,11 @@
 const AsyncHandler = require("express-async-handler");
+const bcrypt = require("bcryptjs");
 
 const expressAsyncHandler = require("express-async-handler");
 const { adminModel } = require("../../model/Staff/adminModel");
 const { generateToken } = require("../../utils/generateToken");
 const { verifyToken } = require("../../utils/verifyToken");
+const { hashPassword, isPassMatched } = require("../../utils/helpers");
 
 //@desc Register admin
 //@route POST /api/admins/register
@@ -13,7 +15,10 @@ exports.registerAdmCtrl = AsyncHandler(async (req, res) => {
   const { name, email, password } = req.body;
   const amdinFound = await adminModel.findOne({ email });
   if (amdinFound) throw new Error("Admin Exists");
-  const user = await adminModel.create({ name, email, password });
+
+  const passwordHashed = await hashPassword(password);
+
+  const user = await adminModel.create({ name, email, password: passwordHashed });
 
   res.status(201).json({
     status: "success",
@@ -29,9 +34,11 @@ exports.loginAdminCtrl = AsyncHandler(async (req, res) => {
   const user = await adminModel.findOne({ email });
 
   if (!user) return res.json({ message: "Invalid login credentials" });
-  if (user && (await user.verifyPassword(password)))
-    return res.json({ data: generateToken(user._id), message: "Admin logged in successfuly" });
-  return res.json({ message: "Invalid login credentials" });
+
+  const isMached = await isPassMatched(password, user.password);
+
+  if (!isMached) return res.json({ message: "Invalid login credentials" });
+  else return res.json({ data: generateToken(user._id), message: "Admin logged in successfuly" });
 });
 //@desc     Get all admins
 //@route    GET /api/v1/admins
@@ -63,12 +70,34 @@ exports.getAdminProfileCtrl = AsyncHandler(async (req, res) => {
 //@desc    update admin
 //@route    UPDATE /api/v1/admins/:id
 //@access   Private
-exports.updateAdminCtrl = async (req, res) => {
-  try {
-  } catch (error) {
-    next(error);
+exports.updateAdminCtrl = AsyncHandler(async (req, res) => {
+  const { email, name, password } = req.body;
+
+  const emailExist = await adminModel.findOne({ email });
+  if (emailExist) throw new Error("this Email is Token/exist");
+
+  const passwordHashed = await hashPassword(password);
+
+  if (password) {
+    const admin = await adminModel.findByIdAndUpdate(
+      req.userAuth._id,
+      { email, password: passwordHashed, name },
+      { new: true, runValidators: true }
+    );
+    res.status(200).json({
+      status: "success",
+      data: admin,
+      message: "Admin updated successfully...",
+    });
+  } else {
+    const admin = await adminModel.findByIdAndUpdate(req.userAuth._id, { email, name }, { new: true, runValidators: true });
+    res.status(200).json({
+      status: "success",
+      data: admin,
+      message: "Admin updated successfully...",
+    });
   }
-};
+});
 //@desc     Delete admin
 //@route    DELETE /api/v1/admins/:id
 //@access   Private
