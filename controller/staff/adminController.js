@@ -55,7 +55,7 @@ exports.getAdminsCtrl = AsyncHandler(async (req, res) => {
 //@route    GET /api/v1/admins/:id
 //@access   Private
 exports.getAdminProfileCtrl = AsyncHandler(async (req, res) => {
-  const admin = await adminModel.findById(req.userAuth._id).select("-password -createdAt -updatedAt");
+  const admin = await adminModel.findById(req.userAuth._id).select("-password -createdAt -updatedAt").populate("academicYears");
   console.log(admin);
   if (!admin) {
     throw new Error("Admin Not Found");
