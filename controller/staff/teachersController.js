@@ -28,7 +28,7 @@ module.exports.adminRegisterTeacher = AsyncHandler(async (req, res) => {
 });
 
 //@desc Login a Teacher
-//@route PUT /api/teachers/login/
+//@route PUT /api/v1/teachers/login/
 //@acess  Private
 module.exports.loginTeacher = AsyncHandler(async (req, res) => {
   const { email, password } = req.body;
@@ -44,5 +44,35 @@ module.exports.loginTeacher = AsyncHandler(async (req, res) => {
     status: "success",
     message: "Teacher Login Successfully",
     data: generateToken(teacher?._id),
+  });
+});
+
+//@desc Get All Teachers
+//@route PUT /api/v1/teachers
+//@acess  Private admin only
+module.exports.getAllTeachersAdmin = AsyncHandler(async (req, res) => {
+  const teachers = await teacherModel.find({});
+
+  res.status(200).json({
+    status: "success",
+    message: "Teachers fetched Successfully",
+    data: teachers,
+  });
+});
+
+//@desc Get Single Teacher
+//@route PUT /api/v1/teachers/:teacherID/amdin
+//@acess  Private admin only
+module.exports.getTeacherByAdmin = AsyncHandler(async (req, res) => {
+  const { teacherID } = req.params;
+
+  const teacher = await teacherModel.findById(teacherID);
+
+  if (!teacher) throw new Error("Teacher not Found");
+
+  res.status(200).json({
+    status: "success",
+    message: "Teacher fetched Successfully",
+    data: teacher,
   });
 });
