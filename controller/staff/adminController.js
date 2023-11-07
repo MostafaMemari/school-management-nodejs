@@ -8,7 +8,7 @@ const { verifyToken } = require("../../utils/verifyToken");
 const { hashPassword, isPassMatched } = require("../../utils/helpers");
 
 //@desc Register admin
-//@route POST /api/admins/register
+//@route POST /api/v1/admins/register
 
 //@acess  Private
 exports.registerAdmCtrl = AsyncHandler(async (req, res) => {

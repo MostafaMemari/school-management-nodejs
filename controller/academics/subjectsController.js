@@ -3,7 +3,7 @@ const { subjectModel } = require("../../model/Academic/subjectModel");
 const { programModel } = require("../../model/Academic/programModel");
 
 //@desc create subject
-//@route POST /api/subjects/:programID
+//@route POST /api/v1/subjects/:programID
 //@acess  Private
 module.exports.createSubject = AsyncHandler(async (req, res) => {
   const { name, description, academicTerm } = req.body;
@@ -33,7 +33,7 @@ module.exports.createSubject = AsyncHandler(async (req, res) => {
 });
 
 //@desc get all subjects
-//@route GET /api/subjects/
+//@route GET /api/v1/subjects/
 //@acess  Private
 module.exports.getSubjects = AsyncHandler(async (req, res) => {
   const subjects = await subjectModel.find({});
@@ -46,7 +46,7 @@ module.exports.getSubjects = AsyncHandler(async (req, res) => {
 });
 
 //@desc get single subject
-//@route GET /api/subjects/:id
+//@route GET /api/v1/subjects/:id
 //@acess  Private
 module.exports.getSubject = AsyncHandler(async (req, res) => {
   const subject = await subjectModel.findById(req.params.id);
@@ -59,7 +59,7 @@ module.exports.getSubject = AsyncHandler(async (req, res) => {
 });
 
 //@desc update subject
-//@route PUT /api/subjects/:id
+//@route PUT /api/v1/subjects/:id
 //@acess  Private
 module.exports.updateSubject = AsyncHandler(async (req, res) => {
   const { name, description, academicTerm } = req.body;
@@ -84,7 +84,7 @@ module.exports.updateSubject = AsyncHandler(async (req, res) => {
 });
 
 //@desc delete subject
-//@route DELETE /api/subjects/:id
+//@route DELETE /api/v1/subjects/:id
 //@acess  Private
 module.exports.deleteSubject = AsyncHandler(async (req, res) => {
   await subjectModel.findByIdAndDelete(req.params.id);

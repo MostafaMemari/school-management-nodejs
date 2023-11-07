@@ -3,7 +3,7 @@ const { adminModel } = require("../../model/Staff/adminModel");
 const { programModel } = require("../../model/Academic/programModel");
 
 //@desc create program
-//@route POST /api/programs/
+//@route POST /api/v1/programs/
 //@acess  Private
 module.exports.createProgram = AsyncHandler(async (req, res) => {
   const { name, description } = req.body;
@@ -29,7 +29,7 @@ module.exports.createProgram = AsyncHandler(async (req, res) => {
 });
 
 //@desc get all programs
-//@route GET /api/programs/
+//@route GET /api/v1/programs/
 //@acess  Private
 module.exports.getPrograms = AsyncHandler(async (req, res) => {
   const programs = await programModel.find({});
@@ -42,7 +42,7 @@ module.exports.getPrograms = AsyncHandler(async (req, res) => {
 });
 
 //@desc get single program
-//@route GET /api/programs/:id
+//@route GET /api/v1/programs/:id
 //@acess  Private
 module.exports.getProgram = AsyncHandler(async (req, res) => {
   const Program = await programModel.findById(req.params.id);
@@ -55,7 +55,7 @@ module.exports.getProgram = AsyncHandler(async (req, res) => {
 });
 
 //@desc update program
-//@route PUT /api/programs/:id
+//@route PUT /api/v1/programs/:id
 //@acess  Private
 module.exports.updateProgram = AsyncHandler(async (req, res) => {
   const { name, description } = req.body;
@@ -76,7 +76,7 @@ module.exports.updateProgram = AsyncHandler(async (req, res) => {
 });
 
 //@desc delete program
-//@route DELETE /api/programs/:id
+//@route DELETE /api/v1/programs/:id
 //@acess  Private
 module.exports.deleteProgram = AsyncHandler(async (req, res) => {
   await programModel.findByIdAndDelete(req.params.id);

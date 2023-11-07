@@ -3,7 +3,7 @@ const { adminModel } = require("../../model/Staff/adminModel");
 const { academicTermModel } = require("../../model/Academic/academicTermModel");
 
 //@desc create Academic Term Year
-//@route POST /api/academic-terms/
+//@route POST /api/v1/academic-terms/
 //@acess  Private
 module.exports.createAcademicTerm = AsyncHandler(async (req, res) => {
   const { name, description, duration } = req.body;
@@ -29,7 +29,7 @@ module.exports.createAcademicTerm = AsyncHandler(async (req, res) => {
 });
 
 //@desc get all Academic Terms
-//@route GET /api/academic-terms/
+//@route GET /api/v1/academic-terms/
 //@acess  Private
 module.exports.getAcademicTerms = AsyncHandler(async (req, res) => {
   const academicTerm = await academicTermModel.find({});
@@ -42,7 +42,7 @@ module.exports.getAcademicTerms = AsyncHandler(async (req, res) => {
 });
 
 //@desc get single Academic Term
-//@route GET /api/academic-terms/:id
+//@route GET /api/v1/academic-terms/:id
 //@acess  Private
 module.exports.getAcademicTerm = AsyncHandler(async (req, res) => {
   const academicTerm = await academicTermModel.findById(req.params.id);
@@ -55,7 +55,7 @@ module.exports.getAcademicTerm = AsyncHandler(async (req, res) => {
 });
 
 //@desc update Academic Term
-//@route PUT /api/academic-terms/:id
+//@route PUT /api/v1/academic-terms/:id
 //@acess  Private
 module.exports.updateAcademicTerm = AsyncHandler(async (req, res) => {
   const { name, description, duration } = req.body;
@@ -80,7 +80,7 @@ module.exports.updateAcademicTerm = AsyncHandler(async (req, res) => {
 });
 
 //@desc delete Academic Term
-//@route DELETE /api/academic-terms/:id
+//@route DELETE /api/v1/academic-terms/:id
 //@acess  Private
 module.exports.deleteAcademicTerm = AsyncHandler(async (req, res) => {
   await academicTermModel.findByIdAndDelete(req.params.id);

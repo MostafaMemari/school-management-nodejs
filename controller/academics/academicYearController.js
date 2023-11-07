@@ -3,7 +3,7 @@ const { academicYearModel } = require("../../model/Academic/academicYearModel");
 const { adminModel } = require("../../model/Staff/adminModel");
 
 //@desc create Academic Year
-//@route POST /api/academic-years/
+//@route POST /api/v1/academic-years/
 //@acess  Private
 module.exports.createAcademicYear = AsyncHandler(async (req, res) => {
   const { name, fromYear, toYear } = req.body;
@@ -29,7 +29,7 @@ module.exports.createAcademicYear = AsyncHandler(async (req, res) => {
 });
 
 //@desc get all Academic Years
-//@route GET /api/academic-years/
+//@route GET /api/v1/academic-years/
 //@acess  Private
 module.exports.getAcademicYears = AsyncHandler(async (req, res) => {
   const academicYears = await academicYearModel.find({});
@@ -42,7 +42,7 @@ module.exports.getAcademicYears = AsyncHandler(async (req, res) => {
 });
 
 //@desc get single Academic Year
-//@route GET /api/academic-years/:id
+//@route GET /api/v1/academic-years/:id
 //@acess  Private
 module.exports.getAcademicYear = AsyncHandler(async (req, res) => {
   const academicYear = await academicYearModel.findById(req.params.id);
@@ -55,7 +55,7 @@ module.exports.getAcademicYear = AsyncHandler(async (req, res) => {
 });
 
 //@desc update Academic Year
-//@route PUT /api/academic-years/:id
+//@route PUT /api/v1/academic-years/:id
 //@acess  Private
 module.exports.updateAcademicYear = AsyncHandler(async (req, res) => {
   const { name, fromYear, toYear } = req.body;
@@ -80,7 +80,7 @@ module.exports.updateAcademicYear = AsyncHandler(async (req, res) => {
 });
 
 //@desc delete Academic Year
-//@route DELETE /api/academic-years/:id
+//@route DELETE /api/v1/academic-years/:id
 //@acess  Private
 module.exports.deleteAcademicYear = AsyncHandler(async (req, res) => {
   await academicYearModel.findByIdAndDelete(req.params.id);

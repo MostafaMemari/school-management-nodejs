@@ -3,7 +3,7 @@ const { adminModel } = require("../../model/Staff/adminModel");
 const { classLevelModel } = require("../../model/Academic/classLevelModel");
 
 //@desc create Class Level
-//@route POST /api/class-levels/
+//@route POST /api/v1/class-levels/
 //@acess  Private
 module.exports.createClassLevel = AsyncHandler(async (req, res) => {
   const { name, description } = req.body;
@@ -29,7 +29,7 @@ module.exports.createClassLevel = AsyncHandler(async (req, res) => {
 });
 
 //@desc get all Class Levels
-//@route GET /api/class-levels/
+//@route GET /api/v1/class-levels/
 //@acess  Private
 module.exports.getClassLevels = AsyncHandler(async (req, res) => {
   const classes = await classLevelModel.find({});
@@ -42,7 +42,7 @@ module.exports.getClassLevels = AsyncHandler(async (req, res) => {
 });
 
 //@desc get single Class Level
-//@route GET /api/class-levels/:id
+//@route GET /api/v1/class-levels/:id
 //@acess  Private
 module.exports.getClassLevel = AsyncHandler(async (req, res) => {
   const classLevel = await classLevelModel.findById(req.params.id);
@@ -55,7 +55,7 @@ module.exports.getClassLevel = AsyncHandler(async (req, res) => {
 });
 
 //@desc update Class Level
-//@route PUT /api/class-levels/:id
+//@route PUT /api/v1/class-levels/:id
 //@acess  Private
 module.exports.updateClassLevel = AsyncHandler(async (req, res) => {
   const { name, description } = req.body;
@@ -80,7 +80,7 @@ module.exports.updateClassLevel = AsyncHandler(async (req, res) => {
 });
 
 //@desc delete Class Level
-//@route DELETE /api/class-levels/:id
+//@route DELETE /api/v1/class-levels/:id
 //@acess  Private
 module.exports.deleteClassLevel = AsyncHandler(async (req, res) => {
   await classLevelModel.findByIdAndDelete(req.params.id);

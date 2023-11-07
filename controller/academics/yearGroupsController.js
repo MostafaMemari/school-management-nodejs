@@ -3,7 +3,7 @@ const { yearGroupModel } = require("../../model/Academic/yearGroupModel");
 const { adminModel } = require("../../model/Staff/adminModel");
 
 //@desc create year group
-//@route POST /api/years-groups/
+//@route POST /api/v1/years-groups/
 //@acess  Private
 module.exports.createYearGroup = AsyncHandler(async (req, res) => {
   const { name, academicYear } = req.body;
@@ -28,7 +28,7 @@ module.exports.createYearGroup = AsyncHandler(async (req, res) => {
 });
 
 //@desc get all year group
-//@route GET /api/years-groups/
+//@route GET /api/v1/years-groups/
 //@acess  Private
 module.exports.getYearGroups = AsyncHandler(async (req, res) => {
   const yearGroups = await yearGroupModel.find({});
@@ -41,7 +41,7 @@ module.exports.getYearGroups = AsyncHandler(async (req, res) => {
 });
 
 //@desc get single year group
-//@route GET /api/years-groups/:id
+//@route GET /api/v1/years-groups/:id
 //@acess  Private
 module.exports.getYearGroup = AsyncHandler(async (req, res) => {
   const yearGroup = await yearGroupModel.findById(req.params.id);
@@ -54,7 +54,7 @@ module.exports.getYearGroup = AsyncHandler(async (req, res) => {
 });
 
 //@desc update year group
-//@route PUT /api/years-groups/:id
+//@route PUT /api/v1/years-groups/:id
 //@acess  Private
 module.exports.updateYearGroup = AsyncHandler(async (req, res) => {
   const { name, academicYear } = req.body;
@@ -79,7 +79,7 @@ module.exports.updateYearGroup = AsyncHandler(async (req, res) => {
 });
 
 //@desc delete year group
-//@route DELETE /api/years-groups/:id
+//@route DELETE /api/v1/years-groups/:id
 //@acess  Private
 module.exports.deleteYearGroup = AsyncHandler(async (req, res) => {
   await yearGroupModel.findByIdAndDelete(req.params.id);
