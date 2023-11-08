@@ -3,8 +3,8 @@ const { teacherModel } = require("../../model/Staff/teacherModel");
 const { examModel } = require("../../model/Academic/examModel");
 
 //@desc Create Exam
-//@route GET /api/v1/exam
-//@acess  Private Teachers Only
+//@route GET /api/v1/exams
+//@acess  Private Teacher Only
 module.exports.createExam = AsyncHandler(async (req, res) => {
   const { name, description, subject, program, academicTerm, duration, examTime, examType, academicYear, classLevel } = req.body;
 
@@ -42,5 +42,66 @@ module.exports.createExam = AsyncHandler(async (req, res) => {
     status: "success",
     message: "Exam Created",
     data: examCreated,
+  });
+});
+
+//@desc get all Exams
+//@route GET /api/v1/exams/
+//@acess  Private
+module.exports.getExams = AsyncHandler(async (req, res) => {
+  const exams = await examModel.find({});
+
+  res.status(201).json({
+    status: "success",
+    message: "Exams feached successfully",
+    data: exams,
+  });
+});
+
+//@desc get single Exam
+//@route GET /api/v1/exam/:id
+//@acess  Private
+module.exports.getExam = AsyncHandler(async (req, res) => {
+  const exam = await examModel.findById(req.params.id);
+
+  res.status(200).json({
+    status: "success",
+    message: "exam feached successfully",
+    data: exam,
+  });
+});
+
+//@desc update Exam
+//@route PUT /api/v1/exams/:id
+//@acess  Private Teacher only
+module.exports.updateExam = AsyncHandler(async (req, res) => {
+  const { name, description, subject, program, academicTerm, duration, examTime, examType, academicYear, classLevel } = req.body;
+
+  const examFound = await examModel.findOne({ name });
+
+  if (examFound) throw new Error("Exam already exists");
+
+  const examUpdated = await examModel.findByIdAndUpdate(
+    req.params.id,
+    {
+      name,
+      description,
+      subject,
+      program,
+      academicTerm,
+      duration,
+      examTime,
+      examType,
+      academicYear,
+      classLevel,
+      createdBy: req.userAuth?._id,
+    },
+    { new: true }
+  );
+
+  res.status(201).json({
+    status: "success",
+    message: "subject updated successfully",
+    data: examUpdated,
   });
 });
