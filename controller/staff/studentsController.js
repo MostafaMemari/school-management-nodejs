@@ -91,3 +91,34 @@ module.exports.getStudentByAdmin = AsyncHandler(async (req, res) => {
     data: student,
   });
 });
+
+//@desc Student Updating Profile
+//@route PUT /api/v1/students/update
+//@acess  Private Student only
+module.exports.studentUpdateProfile = AsyncHandler(async (req, res) => {
+  const { email, password } = req.body;
+
+  const emailExist = await studentModel.findOne({ email });
+  if (emailExist) throw new Error("this Email is exist");
+
+  if (password) {
+    const passwordHashed = await hashPassword(password);
+    const student = await studentModel.findByIdAndUpdate(
+      req.userAuth._id,
+      { email, password: passwordHashed },
+      { new: true, runValidators: true }
+    );
+    res.status(200).json({
+      status: "success",
+      data: student,
+      message: "Student updated successfully...",
+    });
+  } else {
+    const student = await studentModel.findByIdAndUpdate(req.userAuth._id, { email }, { new: true, runValidators: true });
+    res.status(200).json({
+      status: "success",
+      data: student,
+      message: "Student updated successfully...",
+    });
+  }
+});

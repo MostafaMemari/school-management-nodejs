@@ -6,8 +6,6 @@ const isStudentLogin = async (req, res, next) => {
   const headerObj = req.headers;
   const token = headerObj?.authorization?.split(" ")[1];
 
-  console.log(token);
-
   // verify token
   const verifiedToken = verifyToken(token);
 
