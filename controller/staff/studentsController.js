@@ -46,3 +46,18 @@ module.exports.loginStudent = AsyncHandler(async (req, res) => {
     data: generateToken(student?._id),
   });
 });
+
+//@desc Student Profile
+//@route PUT /api/v1/students/profile
+//@acess  Private admin only
+module.exports.studentProfile = AsyncHandler(async (req, res) => {
+  const student = await studentModel.findById(req.userAuth._id).select("-password -createdAt -updatedAt");
+
+  if (!student) throw new Error("student not Found");
+
+  res.status(200).json({
+    status: "success",
+    message: "student Profile fetched Successfully",
+    data: student,
+  });
+});
