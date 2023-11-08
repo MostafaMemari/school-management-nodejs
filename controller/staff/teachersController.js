@@ -122,3 +122,45 @@ module.exports.teacherUpdateProfile = AsyncHandler(async (req, res) => {
     });
   }
 });
+
+//@desc Admin updating Teacher Profile
+//@route PUT /api/v1/teachers/:teacherID/admin
+//@acess  Private Admin only
+module.exports.adminUpdateTeacher = AsyncHandler(async (req, res) => {
+  const { program, classLevel, academicYear, subject } = req.body;
+
+  const teacher = await teacherModel.findById(req.params.teacherID);
+  if (!teacher) throw new Error("Teacher not Found");
+
+  // check if teacher is Withdrawn
+  if (teacher.isWithdrawn) {
+    throw new Error("Action Denied , teacher is Withdrawn");
+  }
+
+  // assign a program
+  if (program) {
+    teacher.program = program;
+    await teacher.save();
+  }
+  // assign class level
+  if (classLevel) {
+    teacher.classLevel = classLevel;
+    await teacher.save();
+  }
+  // assign academic year
+  if (academicYear) {
+    teacher.academicYear = academicYear;
+    await teacher.save();
+  }
+  // assign subject
+  if (subject) {
+    teacher.subject = subject;
+    await teacher.save();
+  }
+
+  res.status(200).json({
+    status: "success",
+    data: teacher,
+    message: "Teacher updated successfully...",
+  });
+});
