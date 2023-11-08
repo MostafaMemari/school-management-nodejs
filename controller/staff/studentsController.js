@@ -61,3 +61,33 @@ module.exports.studentProfile = AsyncHandler(async (req, res) => {
     data: student,
   });
 });
+
+//@desc Get All Students
+//@route PUT /api/v1/students
+//@acess  Private admin only
+module.exports.studentsAdmin = AsyncHandler(async (req, res) => {
+  const students = await studentModel.find({});
+
+  res.status(200).json({
+    status: "success",
+    message: "students fetched Successfully",
+    data: students,
+  });
+});
+
+//@desc Get Single Student
+//@route PUT /api/v1/students/:studentID/amdin
+//@acess  Private admin only
+module.exports.getStudentByAdmin = AsyncHandler(async (req, res) => {
+  const { studentID } = req.params;
+
+  const student = await studentModel.findById(studentID);
+
+  if (!student) throw new Error("Student not Found");
+
+  res.status(200).json({
+    status: "success",
+    message: "Student fetched Successfully",
+    data: student,
+  });
+});
