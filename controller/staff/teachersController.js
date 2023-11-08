@@ -5,7 +5,7 @@ const { generateToken } = require("../../utils/generateToken");
 
 //@desc Admin Register Teacher
 //@route PUT /api/v1/teachers/admin/register
-//@acess  Private
+//@acess  Private Admin Only
 module.exports.adminRegisterTeacher = AsyncHandler(async (req, res) => {
   const { name, email, password } = req.body;
 

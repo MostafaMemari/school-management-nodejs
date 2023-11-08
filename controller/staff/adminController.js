@@ -1,10 +1,7 @@
 const AsyncHandler = require("express-async-handler");
-const bcrypt = require("bcryptjs");
 
-const expressAsyncHandler = require("express-async-handler");
 const { adminModel } = require("../../model/Staff/adminModel");
 const { generateToken } = require("../../utils/generateToken");
-const { verifyToken } = require("../../utils/verifyToken");
 const { hashPassword, isPassMatched } = require("../../utils/helpers");
 
 //@desc Register admin
