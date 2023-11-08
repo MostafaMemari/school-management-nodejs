@@ -76,3 +76,49 @@ module.exports.getTeacherByAdmin = AsyncHandler(async (req, res) => {
     data: teacher,
   });
 });
+
+//@desc Teacher Profile
+//@route PUT /api/v1/teachers/profile
+//@acess  Private admin only
+module.exports.getTeacherProfile = AsyncHandler(async (req, res) => {
+  const teacher = await teacherModel.findById(req.userAuth._id).select("-password -createdAt -updatedAt");
+
+  if (!teacher) throw new Error("Teacher not Found");
+
+  res.status(200).json({
+    status: "success",
+    message: "Teacher Profile fetched Successfully",
+    data: teacher,
+  });
+});
+
+//@desc Teacher Updating Profile
+//@route PUT /api/v1/teachers/update
+//@acess  Private Teacher only
+module.exports.teacherUpdateProfile = AsyncHandler(async (req, res) => {
+  const { email, name, password } = req.body;
+
+  const emailExist = await teacherModel.findOne({ email });
+  if (emailExist) throw new Error("this Email is Token/exist");
+
+  if (password) {
+    const passwordHashed = await hashPassword(password);
+    const teacher = await teacherModel.findByIdAndUpdate(
+      req.userAuth._id,
+      { email, password: passwordHashed, name },
+      { new: true, runValidators: true }
+    );
+    res.status(200).json({
+      status: "success",
+      data: teacher,
+      message: "Teacher updated successfully...",
+    });
+  } else {
+    const teacher = await teacherModel.findByIdAndUpdate(req.userAuth._id, { email, name }, { new: true, runValidators: true });
+    res.status(200).json({
+      status: "success",
+      data: teacher,
+      message: "Teacher updated successfully...",
+    });
+  }
+});

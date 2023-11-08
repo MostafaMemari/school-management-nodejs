@@ -76,9 +76,8 @@ exports.updateAdminCtrl = AsyncHandler(async (req, res) => {
   const emailExist = await adminModel.findOne({ email });
   if (emailExist) throw new Error("this Email is Token/exist");
 
-  const passwordHashed = await hashPassword(password);
-
   if (password) {
+    const passwordHashed = await hashPassword(password);
     const admin = await adminModel.findByIdAndUpdate(
       req.userAuth._id,
       { email, password: passwordHashed, name },

@@ -1,13 +1,14 @@
 const { teacherModel } = require("../model/Staff/teacherModel");
-const verifyToken = require("../utils/verifyToken");
+const { verifyToken } = require("../utils/verifyToken");
 
 const isTeacherLogin = async (req, res, next) => {
   //get token from header
   const headerObj = req.headers;
   const token = headerObj?.authorization?.split(" ")[1];
 
-  //verify token
+  // verify token
   const verifiedToken = verifyToken(token);
+
   if (verifiedToken) {
     //find the admin
     const user = await teacherModel.findById(verifiedToken.id).select("name email role");
