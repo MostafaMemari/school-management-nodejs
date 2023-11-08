@@ -122,3 +122,40 @@ module.exports.studentUpdateProfile = AsyncHandler(async (req, res) => {
     });
   }
 });
+
+//@desc Admin Updating Student eq: Assigning classes...
+//@route PUT /api/v1/students/:studentID/update/admin
+//@acess  Private Admin only
+module.exports.adminUpdatestudent = AsyncHandler(async (req, res) => {
+  const { classLevels, academicYear, program, prefectName, name, email } = req.body;
+
+  // find the students by id
+  const student = await studentModel.findById(req.params.studentID);
+  if (!student) throw new Error("student not Found");
+
+  // update
+  const studentUpdated = await studentModel.findByIdAndUpdate(
+    req.params.studentID,
+    {
+      $set: {
+        name,
+        email,
+        academicYear,
+        program,
+        prefectName,
+      },
+      $addToSet: {
+        classLevels,
+      },
+    },
+    {
+      new: true,
+    }
+  );
+
+  res.status(200).json({
+    status: "success",
+    data: studentUpdated,
+    message: "Student Updated Successfully...",
+  });
+});
