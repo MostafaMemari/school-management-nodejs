@@ -10,7 +10,11 @@ module.exports.createQuestion = AsyncHandler(async (req, res) => {
 
   // find the exam
   const examFound = await examModel.findById(req.params.examID);
-  if (!examFound) throw new Error("Error not found");
+  if (!examFound) throw new Error("Exam not found");
+
+  // check if question
+  const questionExists = await questionModel.findOne({ question });
+  if (questionExists) throw new Error("Question already exists");
 
   // create Exam
   const questionCreated = await questionModel.create({
@@ -30,5 +34,33 @@ module.exports.createQuestion = AsyncHandler(async (req, res) => {
     status: "success",
     message: "Question Created !",
     data: questionCreated,
+  });
+});
+
+//@desc Get All Questions
+//@route GET /api/v1/questions/
+//@acess  Private Teacher Only
+module.exports.getQuestions = AsyncHandler(async (req, res) => {
+  const questions = await questionModel.find({});
+
+  res.status(200).json({
+    status: "success",
+    message: "Questions feached successfully",
+    data: questions,
+  });
+});
+
+//@desc Get Single Questions
+//@route GET /api/v1/questions/:id
+//@acess  Private Teacher Only
+module.exports.getQuestion = AsyncHandler(async (req, res) => {
+  const question = await questionModel.findById(req.params.id);
+
+  if (!question) throw new Error("question not found");
+
+  res.status(200).json({
+    status: "success",
+    message: "Question feached successfully",
+    data: question,
   });
 });

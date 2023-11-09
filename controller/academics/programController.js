@@ -34,7 +34,7 @@ module.exports.createProgram = AsyncHandler(async (req, res) => {
 module.exports.getPrograms = AsyncHandler(async (req, res) => {
   const programs = await programModel.find({});
 
-  res.status(201).json({
+  res.status(200).json({
     status: "success",
     message: "programs feached successfully",
     data: programs,
