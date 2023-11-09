@@ -3,7 +3,7 @@ const { examModel } = require("../../model/Academic/examModel");
 const { questionModel } = require("../../model/Academic/questionModel");
 
 //@desc Create Question
-//@route DELETE /api/v1/:examID/questions
+//@route DELETE /api/v1/questions/:examID
 //@acess  Private Teachers Only
 module.exports.createQuestion = AsyncHandler(async (req, res) => {
   const { question, optionA, optionB, optionC, optionD, correctAnswer } = req.body;
