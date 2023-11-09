@@ -64,3 +64,25 @@ module.exports.getQuestion = AsyncHandler(async (req, res) => {
     data: question,
   });
 });
+
+//@desc update question
+//@route PUT /api/v1/questions/:id
+//@acess  Private
+module.exports.updateQuestion = AsyncHandler(async (req, res) => {
+  const { question, optionA, optionB, optionC, optionD, correctAnswer } = req.body;
+
+  const questionFound = await questionModel.findOne({ question });
+  if (questionFound) throw new Error("question already exists");
+
+  const questionUpdated = await questionModel.findByIdAndUpdate(
+    req.params.id,
+    { question, optionA, optionB, optionC, optionD, correctAnswer, createdBy: req.userAuth._id },
+    { new: true }
+  );
+
+  res.status(201).json({
+    status: "success",
+    message: "Question updated successfully",
+    data: questionUpdated,
+  });
+});
