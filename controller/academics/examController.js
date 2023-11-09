@@ -49,7 +49,7 @@ module.exports.createExam = AsyncHandler(async (req, res) => {
 //@route GET /api/v1/exams/
 //@acess  Private
 module.exports.getExams = AsyncHandler(async (req, res) => {
-  const exams = await examModel.find({});
+  const exams = await examModel.find({}).populate({ path: "questions", populate: { path: "createdBy" } });
 
   res.status(201).json({
     status: "success",
