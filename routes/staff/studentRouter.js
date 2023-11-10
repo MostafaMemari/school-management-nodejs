@@ -6,6 +6,7 @@ const {
   getStudentByAdmin,
   studentUpdateProfile,
   adminUpdatestudent,
+  writeExam,
 } = require("../../controller/staff/studentsController");
 
 const { isAdmin } = require("../../middlewares/isAdmin");
@@ -19,6 +20,8 @@ studentRouter.post("/admin/register", isLogin, isAdmin, adminRegisterStudent);
 studentRouter.get("/admin", isLogin, isAdmin, studentsAdmin);
 studentRouter.get("/:studentID/admin", isLogin, isAdmin, getStudentByAdmin);
 studentRouter.put("/:studentID/update/admin", isLogin, isAdmin, adminUpdatestudent);
+
+studentRouter.post("/exam/:examID/write", isStudentLogin, isStudent, writeExam);
 
 studentRouter.post("/login", loginStudent);
 studentRouter.get("/profile", isStudentLogin, isStudent, studentProfile);

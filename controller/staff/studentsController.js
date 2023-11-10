@@ -2,6 +2,8 @@ const AsyncHandler = require("express-async-handler");
 const { studentModel } = require("../../model/Staff/studentModel");
 const { hashPassword, isPassMatched } = require("../../utils/helpers");
 const { generateToken } = require("../../utils/generateToken");
+const { examModel } = require("../../model/Academic/examModel");
+const { examResultModel } = require("../../model/Academic/examResultModel");
 
 //@desc Admin Register Student
 //@route PUT /api/v1/students/admin/register
@@ -157,5 +159,112 @@ module.exports.adminUpdatestudent = AsyncHandler(async (req, res) => {
     status: "success",
     data: studentUpdated,
     message: "Student Updated Successfully...",
+  });
+});
+
+//@desc Student taking Exam
+//@route POST /api/v1/students/exam/:examID/write
+//@acess  Private Students only
+module.exports.writeExam = AsyncHandler(async (req, res) => {
+  const studentFound = await studentModel.findById(req.userAuth._id);
+  if (!studentFound) throw new Error("Student not found");
+
+  const examFound = await examModel.findById(req.params.examID).populate("questions");
+  if (!examFound) throw new Error("Exam not found");
+
+  // check if student has already taken the exams
+  const studentFoundInResults = await examResultModel.findOne({ student: studentFound?._id, exam: examFound?._id });
+  if (studentFoundInResults) throw new Error("You have already written this exam");
+
+  // get questions
+  const questions = examFound?.questions;
+
+  // get students questions
+  const studentAnswers = req.body.answers;
+
+  // Build report object
+  let correctAnswers = 0;
+  let wrongAnswers = 0;
+  let grade = 0;
+  let score = 0;
+  let status = ""; // failed - passed
+  let remarks = "";
+  let answeredQuestions = [];
+
+  // check if student answered all questions
+  if (studentAnswers.length !== questions.length) throw new Error("You have not answered all the questions");
+
+  // check for Answers
+  for (let i = 0; i < questions.length; i++) {
+    // find the questions
+    const question = questions[i];
+
+    //check if the answer is corrent
+    if (question.correctAnswer === studentAnswers[i]) {
+      correctAnswers++;
+      score++;
+      question.isCorrect = true;
+    } else {
+      wrongAnswers++;
+    }
+  }
+
+  // calculate reports
+
+  grade = (correctAnswers / questions.length) * 100;
+  answeredQuestions = questions.map((question) => {
+    return {
+      question: question.question,
+      correctAnswers: question.correctAnswer,
+      isCorrect: question.isCorrect,
+    };
+  });
+
+  // grade >= 50 ? (status = "Passed") : (status = "Failed");
+
+  // Remark
+  // switch (true) {
+  //   case grade >= 80:
+  //     remarks = "Excellent";
+  //     break;
+  //   case grade >= 70:
+  //     remarks = "Good";
+  //     break;
+  //   case grade >= 50:
+  //     remarks = "Fair";
+  //     break;
+  //   default:
+  //     remarks = "Poor";
+  // }
+
+  status = grade >= 50 ? "Pass" : "Fail";
+  remarks = grade >= 80 ? "Excellent" : grade >= 70 ? "Good" : grade >= 50 ? "Fair" : "Poor";
+
+  // create Exam Results
+  const examResult = await examResultModel.create({
+    student: studentFound._id,
+    exam: examFound?._id,
+    grade,
+    score,
+    status,
+    remarks,
+    classLevel: examFound?.classLevel,
+    academicTerm: examFound?.academicTerm,
+    academicYear: examFound?.academicYear,
+  });
+
+  // push the result into
+  studentFound.examResults.push(examResult?._id);
+  await studentFound.save();
+
+  res.status(200).json({
+    status,
+    remarks,
+    correctAnswers,
+    wrongAnswers,
+    score,
+    grade,
+    answeredQuestions,
+    examResult,
   });
 });
