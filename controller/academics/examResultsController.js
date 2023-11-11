@@ -1,6 +1,7 @@
 const AsyncHandler = require("express-async-handler");
 const { examResultModel } = require("../../model/Academic/examResultModel");
 const { studentModel } = require("../../model/Staff/studentModel");
+const { examModel } = require("../../model/Academic/examModel");
 
 //@desc Exam Result Cheking
 //@route GET /api/v1/exam-results/:id/cheking
@@ -47,5 +48,25 @@ module.exports.getAllExamResults = AsyncHandler(async (req, res) => {
     status: "success",
     message: "Exam Results Fetched",
     data: reuslt,
+  });
+});
+
+//@desc Admin publush exam result
+//@route PUT /api/v1/exam-results/:id/amdin-toggle-publish
+//@acess  Private admin only
+module.exports.adminToggleExamResult = AsyncHandler(async (req, res) => {
+  const { publish } = req.body;
+  // find exam Results
+  const examResult = await examResultModel.findById(req.params.id);
+  if (!examResult) throw new Error("exam result not found");
+
+  const publishResult = await examResultModel.findByIdAndUpdate(req.params.id, { isPublished: publish }, { new: true });
+
+  // const reuslt = await examResultModel.find({}).select("exam").populate("exam");
+
+  res.status(200).json({
+    status: "success",
+    message: "Exam Result Updated",
+    data: publishResult,
   });
 });
