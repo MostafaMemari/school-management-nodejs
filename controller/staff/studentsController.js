@@ -169,12 +169,12 @@ module.exports.writeExam = AsyncHandler(async (req, res) => {
   const studentFound = await studentModel.findById(req.userAuth._id);
   if (!studentFound) throw new Error("Student not found");
 
-  const examFound = await examModel.findById(req.params.examID).populate("questions");
+  const examFound = await examModel.findById(req.params.examID).populate("questions").populate("academicTerm");
   if (!examFound) throw new Error("Exam not found");
 
   // check if student has already taken the exams
-  const studentFoundInResults = await examResultModel.findOne({ student: studentFound?._id, exam: examFound?._id });
-  if (studentFoundInResults) throw new Error("You have already written this exam");
+  // const studentFoundInResults = await examResultModel.findOne({ student: studentFound?._id, exam: examFound?._id });
+  // if (studentFoundInResults) throw new Error("You have already written this exam");
 
   // get questions
   const questions = examFound?.questions;
@@ -192,7 +192,7 @@ module.exports.writeExam = AsyncHandler(async (req, res) => {
   let answeredQuestions = [];
 
   // check if student answered all questions
-  if (studentAnswers.length !== questions.length) throw new Error("You have not answered all the questions");
+  // if (studentAnswers.length !== questions.length) throw new Error("You have not answered all the questions");
 
   // check for Answers
   for (let i = 0; i < questions.length; i++) {
@@ -241,30 +241,50 @@ module.exports.writeExam = AsyncHandler(async (req, res) => {
   remarks = grade >= 80 ? "Excellent" : grade >= 70 ? "Good" : grade >= 50 ? "Fair" : "Poor";
 
   // create Exam Results
-  const examResult = await examResultModel.create({
-    student: studentFound._id,
-    exam: examFound?._id,
-    grade,
-    score,
-    status,
-    remarks,
-    classLevel: examFound?.classLevel,
-    academicTerm: examFound?.academicTerm,
-    academicYear: examFound?.academicYear,
-  });
+  // const examResult = await examResultModel.create({
+  //   student: studentFound._id,
+  //   exam: examFound?._id,
+  //   grade,
+  //   score,
+  //   status,
+  //   remarks,
+  //   classLevel: examFound?.classLevel,
+  //   academicTerm: examFound?.academicTerm,
+  //   academicYear: examFound?.academicYear,
+  // });
 
   // push the result into
-  studentFound.examResults.push(examResult?._id);
-  await studentFound.save();
+  // studentFound.examResults.push(examResult?._id);
+  // await studentFound.save();
 
+  // Promoting
+  // promote student to level 200
+  if (examFound.academicTerm.name === "3st term" && status === "Pass" && studentFound?.currentClassLevel === "Level 100") {
+    studentFound.classLevels.addToSet("Level 200");
+    studentFound.currentClassLevel = "Level 200";
+    await studentFound.save();
+  }
+  // promote student to level 300
+  if (examFound.academicTerm.name === "3st term" && status === "Pass" && studentFound?.currentClassLevel === "Level 200") {
+    studentFound.classLevels.addToSet("Level 300");
+    studentFound.currentClassLevel = "Level 300";
+    await studentFound.save();
+  }
+  // promote student to level 400
+  if (examFound.academicTerm.name === "3st term" && status === "Pass" && studentFound?.currentClassLevel === "Level 300") {
+    studentFound.classLevels.addToSet("Level 400");
+    studentFound.currentClassLevel = "Level 400";
+    await studentFound.save();
+  }
   res.status(200).json({
     status,
+    studentFound,
     remarks,
     correctAnswers,
     wrongAnswers,
     score,
     grade,
     answeredQuestions,
-    examResult,
+    // examResult,
   });
 });

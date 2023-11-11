@@ -1,6 +1,7 @@
 const AsyncHandler = require("express-async-handler");
 const { adminModel } = require("../../model/Staff/adminModel");
 const { programModel } = require("../../model/Academic/programModel");
+const { subjectModel } = require("../../model/Academic/subjectModel");
 
 //@desc create program
 //@route POST /api/v1/programs/
