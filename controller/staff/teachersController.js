@@ -60,9 +60,28 @@ module.exports.loginTeacher = AsyncHandler(async (req, res) => {
 //@route PUT /api/v1/teachers
 //@acess  Private admin only
 module.exports.getAllTeachersAdmin = AsyncHandler(async (req, res) => {
-  const teachers = await teacherModel.find({});
+  const query = req.query;
+  // convert query string to number
+  const page = Number(query.page) || 1;
+  const limit = Number(query.limit) || 5;
+  const skip = (page - 1) * limit;
+  const total = await teacherModel.countDocuments();
+  const startIndex = (page - 1) * limit;
+  const endIndex = page * limit;
+
+  // pagination result
+  const pagination = {};
+  // add next
+  if (endIndex < total) pagination.next = { page: page + 1, limit };
+  // add prev
+  if (startIndex > 0) pagination.prev = { page: page - 1, limit };
+
+  const teachers = await teacherModel.find({}).select("-password").limit(limit).skip(skip);
 
   res.status(200).json({
+    total,
+    pagination,
+    results: teachers.length,
     status: "success",
     message: "Teachers fetched Successfully",
     data: teachers,
