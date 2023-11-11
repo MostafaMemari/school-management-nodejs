@@ -52,7 +52,16 @@ exports.getAdminsCtrl = AsyncHandler(async (req, res) => {
 //@route    GET /api/v1/admins/:id
 //@access   Private
 exports.getAdminProfileCtrl = AsyncHandler(async (req, res) => {
-  const admin = await adminModel.findById(req.userAuth._id).select("-password -createdAt -updatedAt").populate("academicYears");
+  const admin = await adminModel
+    .findById(req.userAuth._id)
+    .select("-password -createdAt -updatedAt")
+    .populate("academicYears")
+    .populate("academicTerms")
+    .populate("programs")
+    .populate("yearGroups")
+    .populate("classLevels")
+    .populate("teachers")
+    .populate("students");
   console.log(admin);
   if (!admin) {
     throw new Error("Admin Not Found");
@@ -94,6 +103,7 @@ exports.updateAdminCtrl = AsyncHandler(async (req, res) => {
     });
   }
 });
+
 //@desc     Delete admin
 //@route    DELETE /api/v1/admins/:id
 //@access   Private

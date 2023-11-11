@@ -2,12 +2,17 @@ const AsyncHandler = require("express-async-handler");
 const { teacherModel } = require("../../model/Staff/teacherModel");
 const { hashPassword, isPassMatched } = require("../../utils/helpers");
 const { generateToken } = require("../../utils/generateToken");
+const { adminModel } = require("../../model/Staff/adminModel");
 
 //@desc Admin Register Teacher
 //@route PUT /api/v1/teachers/admin/register
 //@acess  Private Admin Only
 module.exports.adminRegisterTeacher = AsyncHandler(async (req, res) => {
   const { name, email, password } = req.body;
+
+  // find the admin
+  const adminFound = await adminModel.findById(req.userAuth._id);
+  if (!adminFound) throw new Error("admin not found");
 
   const teacher = await teacherModel.findOne({ email });
   if (teacher) {
@@ -19,6 +24,10 @@ module.exports.adminRegisterTeacher = AsyncHandler(async (req, res) => {
 
   // create
   const teacherCreated = await teacherModel.create({ name, email, password: hashedPassword });
+
+  // push teacher into admin
+  adminFound.teachers.push(teacherCreated?._id);
+  await adminFound.save();
 
   res.status(201).json({
     status: "success",

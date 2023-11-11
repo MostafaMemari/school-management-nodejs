@@ -4,12 +4,17 @@ const { hashPassword, isPassMatched } = require("../../utils/helpers");
 const { generateToken } = require("../../utils/generateToken");
 const { examModel } = require("../../model/Academic/examModel");
 const { examResultModel } = require("../../model/Academic/examResultModel");
+const { adminModel } = require("../../model/Staff/adminModel");
 
 //@desc Admin Register Student
 //@route PUT /api/v1/students/admin/register
 //@acess  Private Admin Only
 module.exports.adminRegisterStudent = AsyncHandler(async (req, res) => {
   const { name, email, password } = req.body;
+
+  // find the admin
+  const adminFound = await adminModel.findById(req.userAuth._id);
+  if (!adminFound) throw new Error("admin not found");
 
   const student = await studentModel.findOne({ email });
   if (student) {
@@ -21,6 +26,10 @@ module.exports.adminRegisterStudent = AsyncHandler(async (req, res) => {
 
   // create
   const studentRegistered = await studentModel.create({ name, email, password: hashedPassword });
+
+  // push teacher into admin
+  adminFound.students.push(studentRegistered?._id);
+  await adminFound.save();
 
   res.status(201).json({
     status: "success",
