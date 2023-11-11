@@ -129,7 +129,7 @@ module.exports.studentUpdateProfile = AsyncHandler(async (req, res) => {
 //@route PUT /api/v1/students/:studentID/update/admin
 //@acess  Private Admin only
 module.exports.adminUpdatestudent = AsyncHandler(async (req, res) => {
-  const { classLevels, academicYear, program, prefectName, name, email } = req.body;
+  const { classLevels, academicYear, program, prefectName, name, email, isSuspended, isGraduated } = req.body;
 
   // find the students by id
   const student = await studentModel.findById(req.params.studentID);
@@ -145,6 +145,8 @@ module.exports.adminUpdatestudent = AsyncHandler(async (req, res) => {
         academicYear,
         program,
         prefectName,
+        isSuspended,
+        isGraduated,
       },
       $addToSet: {
         classLevels,
@@ -172,6 +174,9 @@ module.exports.writeExam = AsyncHandler(async (req, res) => {
   const examFound = await examModel.findById(req.params.examID).populate("questions").populate("academicTerm");
   if (!examFound) throw new Error("Exam not found");
 
+  // check if student is suspended
+  if (studentFound.isWithdrawn || studentFound.isSuspended) throw new Error("You are suspended/withdrawn , you can't take this exam");
+
   // check if student has already taken the exams
   // const studentFoundInResults = await examResultModel.findOne({ student: studentFound?._id, exam: examFound?._id });
   // if (studentFoundInResults) throw new Error("You have already written this exam");
@@ -192,7 +197,7 @@ module.exports.writeExam = AsyncHandler(async (req, res) => {
   let answeredQuestions = [];
 
   // check if student answered all questions
-  // if (studentAnswers.length !== questions.length) throw new Error("You have not answered all the questions");
+  if (studentAnswers.length !== questions.length) throw new Error("You have not answered all the questions");
 
   // check for Answers
   for (let i = 0; i < questions.length; i++) {
@@ -220,42 +225,25 @@ module.exports.writeExam = AsyncHandler(async (req, res) => {
     };
   });
 
-  // grade >= 50 ? (status = "Passed") : (status = "Failed");
-
-  // Remark
-  // switch (true) {
-  //   case grade >= 80:
-  //     remarks = "Excellent";
-  //     break;
-  //   case grade >= 70:
-  //     remarks = "Good";
-  //     break;
-  //   case grade >= 50:
-  //     remarks = "Fair";
-  //     break;
-  //   default:
-  //     remarks = "Poor";
-  // }
-
   status = grade >= 50 ? "Pass" : "Fail";
   remarks = grade >= 80 ? "Excellent" : grade >= 70 ? "Good" : grade >= 50 ? "Fair" : "Poor";
 
-  // create Exam Results
-  // const examResult = await examResultModel.create({
-  //   student: studentFound._id,
-  //   exam: examFound?._id,
-  //   grade,
-  //   score,
-  //   status,
-  //   remarks,
-  //   classLevel: examFound?.classLevel,
-  //   academicTerm: examFound?.academicTerm,
-  //   academicYear: examFound?.academicYear,
-  // });
+  // Generate Exam Results
+  const examResult = await examResultModel.create({
+    studentID: studentFound.studentId,
+    exam: examFound?._id,
+    grade,
+    score,
+    status,
+    remarks,
+    classLevel: examFound?.classLevel,
+    academicTerm: examFound?.academicTerm,
+    academicYear: examFound?.academicYear,
+  });
 
   // push the result into
-  // studentFound.examResults.push(examResult?._id);
-  // await studentFound.save();
+  studentFound.examResults.push(examResult?._id);
+  await studentFound.save();
 
   // Promoting
   // promote student to level 200
@@ -272,19 +260,12 @@ module.exports.writeExam = AsyncHandler(async (req, res) => {
   }
   // promote student to level 400
   if (examFound.academicTerm.name === "3st term" && status === "Pass" && studentFound?.currentClassLevel === "Level 300") {
-    studentFound.classLevels.addToSet("Level 400");
-    studentFound.currentClassLevel = "Level 400";
+    studentFound.isGraduated = true;
+    studentFound.yearGraduated = new Date();
     await studentFound.save();
   }
   res.status(200).json({
     status,
-    studentFound,
-    remarks,
-    correctAnswers,
-    wrongAnswers,
-    score,
-    grade,
-    answeredQuestions,
-    // examResult,
+    data: "You have submitted your exam , check later for the result",
   });
 });
