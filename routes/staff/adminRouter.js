@@ -14,9 +14,11 @@ const {
   adminUnPublishResultsCtrl,
   deleteAdminCtrl,
 } = require("../../controller/staff/adminController");
+const { advancedResult } = require("../../middlewares/advancedResult");
 const { isAdmin } = require("../../middlewares/isAdmin");
 
 const { isLogin } = require("../../middlewares/isLogin");
+const { adminModel } = require("../../model/Staff/adminModel");
 
 //register
 adminRouter.post("/register", registerAdmCtrl);
@@ -25,7 +27,9 @@ adminRouter.post("/register", registerAdmCtrl);
 adminRouter.post("/login", loginAdminCtrl);
 
 //get all
-adminRouter.get("/", isLogin, getAdminsCtrl);
+adminRouter.get("/", isLogin, advancedResult(adminModel), getAdminsCtrl);
+// , { path: "examsCreated", populate: { path: "questions" } }
+
 //single
 
 adminRouter.get("/profile", isLogin, isAdmin, getAdminProfileCtrl);
