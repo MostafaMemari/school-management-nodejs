@@ -41,7 +41,7 @@ module.exports.checkExamResults = AsyncHandler(async (req, res) => {
 //@route GET /api/v1/exam-results
 //@acess  Private Students only
 module.exports.getAllExamResults = AsyncHandler(async (req, res) => {
-  const reuslt = await examResultModel.find({});
+  const reuslt = await examResultModel.find({}).select("exam").populate("exam");
 
   res.status(200).json({
     status: "success",

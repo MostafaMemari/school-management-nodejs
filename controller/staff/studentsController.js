@@ -53,14 +53,35 @@ module.exports.loginStudent = AsyncHandler(async (req, res) => {
 //@route PUT /api/v1/students/profile
 //@acess  Private admin only
 module.exports.studentProfile = AsyncHandler(async (req, res) => {
-  const student = await studentModel.findById(req.userAuth._id).select("-password -createdAt -updatedAt");
+  const student = await studentModel.findById(req.userAuth._id).select("-password -createdAt -updatedAt").populate("examResults");
 
   if (!student) throw new Error("student not Found");
+
+  // get student profile
+  const studentProfile = {
+    name: student?.name,
+    email: student?.email,
+    currentClassLevel: student?.currentClassLevel,
+    program: student?.program,
+    dateAdmitted: student?.dateAdmitted,
+    isSuspended: student?.isSuspended,
+    isWithdrawn: student?.isWithdrawn,
+    studentId: student?.studentId,
+    prefectName: student?.prefectName,
+  };
+
+  const examResulls = student?.examResults;
+
+  const currentExamReuslt = examResulls[examResulls.length - 1];
+
+  // check if exam is published
+  const isPublished = currentExamReuslt?.isPublished;
 
   res.status(200).json({
     status: "success",
     message: "student Profile fetched Successfully",
-    data: student,
+    data: studentProfile,
+    currentExamReuslt: isPublished ? currentExamReuslt : [],
   });
 });
 
@@ -178,8 +199,8 @@ module.exports.writeExam = AsyncHandler(async (req, res) => {
   if (studentFound.isWithdrawn || studentFound.isSuspended) throw new Error("You are suspended/withdrawn , you can't take this exam");
 
   // check if student has already taken the exams
-  // const studentFoundInResults = await examResultModel.findOne({ student: studentFound?._id, exam: examFound?._id });
-  // if (studentFoundInResults) throw new Error("You have already written this exam");
+  const studentFoundInResults = await examResultModel.findOne({ student: studentFound?._id, exam: examFound?._id });
+  if (studentFoundInResults) throw new Error("You have already written this exam");
 
   // get questions
   const questions = examFound?.questions;
@@ -239,6 +260,7 @@ module.exports.writeExam = AsyncHandler(async (req, res) => {
     classLevel: examFound?.classLevel,
     academicTerm: examFound?.academicTerm,
     academicYear: examFound?.academicYear,
+    answeredQuestions,
   });
 
   // push the result into
