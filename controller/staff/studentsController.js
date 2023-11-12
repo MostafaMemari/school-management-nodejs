@@ -98,13 +98,9 @@ module.exports.studentProfile = AsyncHandler(async (req, res) => {
 //@route PUT /api/v1/students
 //@acess  Private admin only
 module.exports.studentsAdmin = AsyncHandler(async (req, res) => {
-  const students = await studentModel.find({});
+  // const students = await studentModel.find({});
 
-  res.status(200).json({
-    status: "success",
-    message: "students fetched Successfully",
-    data: students,
-  });
+  res.status(200).json(res.result);
 });
 
 //@desc Get Single Student

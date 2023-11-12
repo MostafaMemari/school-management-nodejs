@@ -16,6 +16,7 @@ const {
 } = require("../../controller/staff/adminController");
 const { advancedResult } = require("../../middlewares/advancedResult");
 const { isAdmin } = require("../../middlewares/isAdmin");
+const { isAuth } = require("../../middlewares/isAuth");
 
 const { isLogin } = require("../../middlewares/isLogin");
 const { adminModel } = require("../../model/Staff/adminModel");
@@ -27,12 +28,11 @@ adminRouter.post("/register", registerAdmCtrl);
 adminRouter.post("/login", loginAdminCtrl);
 
 //get all
-adminRouter.get("/", isLogin, advancedResult(adminModel), getAdminsCtrl);
+adminRouter.get("/", isAuth(adminModel), advancedResult(adminModel, "academicTerms"), getAdminsCtrl);
 // , { path: "examsCreated", populate: { path: "questions" } }
-
 //single
 
-adminRouter.get("/profile", isLogin, isAdmin, getAdminProfileCtrl);
+adminRouter.get("/profile", isAuth(adminModel), isAdmin, getAdminProfileCtrl);
 
 //update
 adminRouter.put("/", isLogin, isAdmin, updateAdminCtrl);
